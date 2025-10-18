@@ -3,6 +3,7 @@
 class Workout {
     date = new Date();
     id = (Date.now() + '').slice(-10);
+    clicks = 0;
 
     constructor(coords, distance, duration) {
         this.coords = coords; // [lat, lng]
@@ -15,9 +16,12 @@ class Workout {
         // prettier-ignore
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-        this.Description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${this.date.getMonth()} ${this.date.getDate()}`;
+        this.Description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
     }
 
+    _click(){
+        this.clicks++
+    }
 }
 
 class Running extends Workout {
@@ -66,6 +70,7 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 class App {
     #map;
+    #mapZoomLevel = 13;
     #mapEvent;
     #workouts = [];
 
@@ -73,7 +78,8 @@ class App {
     constructor() {
         this._getPosition();
         form.addEventListener('submit', this._newWorkout.bind(this));
-        inputType.addEventListener('change', this._toggleElevationField)
+        inputType.addEventListener('change', this._toggleElevationField);
+        containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
     }
 
     _getPosition() {
@@ -91,7 +97,7 @@ class App {
 
         const coords = [latitude, longitude]
 
-        this.#map = L.map('map').setView(coords, 13);
+        this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
         console.log(this);
 
@@ -109,6 +115,17 @@ class App {
         form.classList.remove('hidden');
         inputDistance.focus();
     }
+
+    _hideForm() {
+        //empty inputs
+        inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = '';
+
+        form.style.display = 'none';
+        form.classList.add('hidden');
+        setTimeout(() => form.style.display = 'grid', 1000);
+
+    }
+
 
     _toggleElevationField() {
         inputElevation.closest('.form__row').classList.toggle('form__row--hidden')
@@ -165,7 +182,7 @@ class App {
 
 
         //clear input fields
-        inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = '';
+        this._hideForm()
     }
 
     _renderWorkoutMarker(workout) {
@@ -180,7 +197,7 @@ class App {
                     className: `${workout.type}-popup`,
                 })
             )
-            .setPopupContent(workout.type)
+            .setPopupContent(`${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.Description}`)
             .openPopup();
     }
 
@@ -229,6 +246,26 @@ class App {
 
         form.insertAdjacentHTML('afterend', html);
     }
+
+    _moveToPopup(e) {
+        const workoutEl = e.target.closest('.workout')
+        console.log(workoutEl);
+
+        if (!workoutEl) return;
+
+        const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id)
+        console.log(workout);
+
+        this.#map.setView(workout.coords, this.#mapZoomLevel, {
+            animate: true,
+            pan: {
+                duration: 1,
+            }
+        })
+
+        workout._click()
+    }
+
 }
 
 const app = new App();
