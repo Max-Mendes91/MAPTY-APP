@@ -174,7 +174,7 @@ class App {
                 workout.distance = distance;
                 workout.duration = duration;
                 workout.cadence = cadence;
-                
+
             }
 
             if (type === 'cycling') {
@@ -227,8 +227,6 @@ class App {
 
             // Reset edit mode
             this.#editingWorkoutId = null;
-
-            
 
             // Hide form
             this._hideForm();
@@ -466,7 +464,7 @@ class App {
         console.log(`Workout with ID ${id} deleted`);
     }
 
-    
+
     reset() {
         localStorage.removeItem('workouts');
         location.reload();
