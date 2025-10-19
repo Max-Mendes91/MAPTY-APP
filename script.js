@@ -74,6 +74,8 @@ class App {
     #mapEvent;
     #workouts = [];
     #editingWorkoutId = null;
+    #delitingWorkoutID = null;
+    #markers = new Map();
 
 
     constructor() {
@@ -226,6 +228,8 @@ class App {
             // Reset edit mode
             this.#editingWorkoutId = null;
 
+            
+
             // Hide form
             this._hideForm();
 
@@ -275,7 +279,7 @@ class App {
     }
 
     _renderWorkoutMarker(workout) {
-        L.marker(workout.coords)
+        const marker = L.marker(workout.coords)
             .addTo(this.#map)
             .bindPopup(
                 L.popup({
@@ -288,12 +292,16 @@ class App {
             )
             .setPopupContent(`${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.Description}`)
             .openPopup();
+
+        // Store marker by workout ID
+        this.#markers.set(workout.id, marker);
     }
 
     _renderWorkout(workout) {
         let html = `
         <li class="workout workout--${workout.type}" data-id="${workout.id}">
             <button class="workout__edit">Edit</button>
+            <button class='workout__delete'>Delete</button>
           <h2 class="workout__title">${workout.Description}</h2>
           <div class="workout__details">
             <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'}</span>
@@ -367,6 +375,16 @@ class App {
             return;
         }
 
+        if (e.target.classList.contains('workout__delete')) {
+            const workoutEl = e.target.closest('.workout');
+            const workoutId = workoutEl.dataset.id;
+
+            console.log('Delete workout with ID:', workoutId);
+
+            this._deleteWorkout(workoutId);
+            return;
+        }
+
         const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id)
 
 
@@ -426,6 +444,26 @@ class App {
         // Show the form
         form.classList.remove('hidden');
         inputDistance.focus();
+    }
+
+    _deleteWorkout(id) {
+        // Remove from array
+        this.#workouts = this.#workouts.filter(work => work.id !== id);
+
+        // Remove marker from map
+        const marker = this.#markers.get(id);
+        if (marker) {
+            this.#map.removeLayer(marker);
+            this.#markers.delete(id);
+        }
+
+        // Update UI
+        this._renderAllWorkouts();
+
+        // Update local storage
+        this._setLocalStorage();
+
+        console.log(`Workout with ID ${id} deleted`);
     }
 
     

@@ -386,10 +386,11 @@ a:visited {
   }
 }
 
-.workout__edit {
+/* Edit and Delete Button Container */
+.workout__edit,
+.workout__delete {
   position: absolute;
   top: 1.5rem;
-  right: 1.5rem;
   background-color: transparent;
   border: none;
   font-size: 1.8rem;
@@ -400,17 +401,39 @@ a:visited {
   opacity: 0.7;
 }
 
+/* Position Edit button */
+.workout__edit {
+  right: 8rem;
+  /* Moved left to make room for delete */
+}
+
+/* Position Delete button */
+.workout__delete {
+  right: 1.5rem;
+}
+
+/* Hover effects */
 .workout__edit:hover {
   opacity: 1;
   transform: scale(1.1);
-  color: var(--color-light--2);
+  color: var(--color-brand--2);
+  /* Green for edit */
 }
 
-.workout__edit:active {
+.workout__delete:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  color: #ff4757;
+  /* Red for delete */
+}
+
+/* Active (click) effects */
+.workout__edit:active,
+.workout__delete:active {
   transform: scale(0.95);
 }
 
-/* Make workout card position relative for absolute positioning of edit button */
+/* Make workout card position relative for absolute positioning of buttons */
 .workout {
   position: relative;
 }
