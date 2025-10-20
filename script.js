@@ -100,7 +100,7 @@ class App {
         if (navigator.geolocation)
             navigator.geolocation.getCurrentPosition(this._loadMap.bind(this),
                 function () {
-                    alert('Could not get your position');
+                    this._showError('Please enter valid positive numbers.');
                 });
     }
 
@@ -172,7 +172,7 @@ class App {
                 // Validate
                 if (!validInputs(distance, duration, cadence) ||
                     !allPositive(distance, duration, cadence))
-                    return alert('Inputs have to be positive numbers!');
+                    return this._showError('Please enter valid positive numbers.');
 
                 // Update properties
                 workout.distance = distance;
@@ -187,7 +187,7 @@ class App {
                 // Validate
                 if (!validInputs(distance, duration, elevation) ||
                     !allPositive(distance, duration))
-                    return alert('Inputs have to be positive numbers!');
+                    return this._showError('Please enter valid positive numbers.');
 
                 // Update properties
                 workout.distance = distance;
@@ -198,7 +198,7 @@ class App {
 
                     if (!validInputs(distance, duration, cadence) ||
                         !allPositive(distance, duration, cadence))
-                        return alert('Inputs have to be positive numbers!');
+                        return this._showMessage('Please enter positive numbers only.', 'error');
 
                     // Update properties
                     workout.distance = distance;
@@ -212,7 +212,7 @@ class App {
 
                     if (!validInputs(distance, duration, elevation) ||
                         !allPositive(distance, duration))
-                        return alert('Inputs have to be positive numbers!');
+                        return this._showError('Please enter valid positive numbers.');
 
                     // Update properties
                     workout.distance = distance;
@@ -250,7 +250,7 @@ class App {
             //check if data is valid
             if (!validInputs(distance, duration, cadence) ||
                 !allPositive(distance, duration, cadence))
-                return alert('Inputs have to be positive numbers!');
+                return this._showError('Please enter valid positive numbers.');
 
             workout = new Running([lat, lng], distance, duration, cadence);
         }
@@ -261,7 +261,7 @@ class App {
             //check if data is valid
             if (!validInputs(distance, duration, elevation) ||
                 !allPositive(distance, duration))
-                return alert('Inputs have to be positive numbers!');
+                return this._showError('Please enter valid positive numbers.');
 
             workout = new Cycling([lat, lng], distance, duration, elevation);
         }
@@ -521,6 +521,15 @@ class App {
         workouts.forEach(work => work.remove());
 
         sorted.forEach(work => this._renderWorkout(work));
+    }
+
+    _showError(msg) {
+        const box = document.querySelector('.message-box');
+        box.textContent = msg;
+        box.classList.add('show');
+
+        clearTimeout(this._hideTimeout);
+        this._hideTimeout = setTimeout(() => box.classList.remove('show'), 2000);
     }
 
 
