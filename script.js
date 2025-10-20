@@ -91,6 +91,8 @@ class App {
         inputType.addEventListener('change', this._toggleElevationField);
         containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
         btnDeleteAll.addEventListener('click', this._deleteAllWorkouts.bind(this));
+        this._sortSelect = document.querySelector('.sort-select');
+        this._sortSelect.addEventListener('change', this._sortWorkouts.bind(this));
 
     }
 
@@ -467,7 +469,7 @@ class App {
     }
 
     _deleteAllWorkouts() {
-        
+
         const confirmDelete = confirm('Are you sure you want to delete all workouts? This cannot be undone.');
 
         if (!confirmDelete) return;
@@ -488,6 +490,22 @@ class App {
         console.log('All workouts deleted');
     }
 
+    _sortWorkouts(e) {
+        const criteria = e.target.value;
+
+        // Clone to avoid mutating original
+        const sorted = [...this.#workouts];
+
+        if (criteria === 'distance') sorted.sort((a, b) => b.distance - a.distance);
+        if (criteria === 'duration') sorted.sort((a, b) => b.duration - a.duration);
+        if (criteria === 'date') sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Clear and re-render
+        const workouts = document.querySelectorAll('.workout');
+        workouts.forEach(work => work.remove());
+
+        sorted.forEach(work => this._renderWorkout(work));
+    }
 
 
     reset() {
