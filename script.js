@@ -1,4 +1,5 @@
 'use strict';
+const btnDeleteAll = document.querySelector('.btn-delete-all');
 
 class Workout {
     date = new Date();
@@ -89,6 +90,7 @@ class App {
         form.addEventListener('submit', this._newWorkout.bind(this));
         inputType.addEventListener('change', this._toggleElevationField);
         containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
+        btnDeleteAll.addEventListener('click', this._deleteAllWorkouts.bind(this));
 
     }
 
@@ -463,6 +465,29 @@ class App {
 
         console.log(`Workout with ID ${id} deleted`);
     }
+
+    _deleteAllWorkouts() {
+        
+        const confirmDelete = confirm('Are you sure you want to delete all workouts? This cannot be undone.');
+
+        if (!confirmDelete) return;
+        // 1. Clear workouts array
+        this.#workouts = [];
+
+        // 2. Remove all markers from map
+        this.#markers.forEach(marker => this.#map.removeLayer(marker));
+        this.#markers.clear();
+
+        // 3. Remove all workout elements from UI
+        const workouts = document.querySelectorAll('.workout');
+        workouts.forEach(work => work.remove());
+
+        // 4. Clear local storage
+        localStorage.removeItem('workouts');
+
+        console.log('All workouts deleted');
+    }
+
 
 
     reset() {
