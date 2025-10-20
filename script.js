@@ -4,7 +4,7 @@
 class Workout {
     date = new Date();
     id = (Date.now() + '').slice(-10);
-    clicks = 0;
+    
 
     constructor(coords, distance, duration) {
         this.coords = coords; // [lat, lng]
@@ -18,10 +18,6 @@ class Workout {
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
         this.Description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
-    }
-
-    _click() {
-        this.clicks++
     }
 }
 
@@ -223,9 +219,9 @@ class App {
                 }
             }
 
-            console.log('About to re-render workouts');
+            
             this._renderAllWorkouts();
-            console.log('Finished re-rendering');
+           
 
             // Update local storage
             this._setLocalStorage();
@@ -371,7 +367,7 @@ class App {
             const workoutEl = e.target.closest('.workout');
             const workoutId = workoutEl.dataset.id;
 
-            console.log('Edit workout with ID:', workoutId);
+            
 
             // Call edit method
             this._editWorkout(workoutId);
@@ -382,7 +378,7 @@ class App {
             const workoutEl = e.target.closest('.workout');
             const workoutId = workoutEl.dataset.id;
 
-            console.log('Delete workout with ID:', workoutId);
+            
 
             this._deleteWorkout(workoutId);
             return;
@@ -438,7 +434,7 @@ class App {
 
         if (!workout) return;
 
-        console.log('Editing workout:', workout);
+        
 
         // Set edit mode
         this.#editingWorkoutId = id;
@@ -481,7 +477,7 @@ class App {
         // Update local storage
         this._setLocalStorage();
 
-        console.log(`Workout with ID ${id} deleted`);
+        
     }
 
     _deleteAllWorkouts() {
@@ -505,7 +501,7 @@ class App {
         // 4. Clear local storage
         localStorage.removeItem('workouts');
 
-        console.log('All workouts deleted');
+        
     }
 
     _sortWorkouts(e) {
