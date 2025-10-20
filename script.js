@@ -1,5 +1,5 @@
 'use strict';
-const btnDeleteAll = document.querySelector('.btn-delete-all');
+
 
 class Workout {
     date = new Date();
@@ -66,6 +66,7 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
+const btnDeleteAll = document.querySelector('.btn-delete-all');
 
 
 
@@ -484,10 +485,13 @@ class App {
     }
 
     _deleteAllWorkouts() {
+        this._showConfirm(
+            'Are you sure you want to delete all workouts? This cannot be undone.',
+            () => this._performDeleteAll()
+        );
+    }
 
-        const confirmDelete = confirm('Are you sure you want to delete all workouts? This cannot be undone.');
-
-        if (!confirmDelete) return;
+    _performDeleteAll() {
         // 1. Clear workouts array
         this.#workouts = [];
 
@@ -496,8 +500,7 @@ class App {
         this.#markers.clear();
 
         // 3. Remove all workout elements from UI
-        const workouts = document.querySelectorAll('.workout');
-        workouts.forEach(work => work.remove());
+        document.querySelectorAll('.workout').forEach(work => work.remove());
 
         // 4. Clear local storage
         localStorage.removeItem('workouts');
@@ -532,6 +535,24 @@ class App {
         this._hideTimeout = setTimeout(() => box.classList.remove('show'), 2000);
     }
 
+    _showConfirm(message, onConfirm) {
+        const confirmBox = document.createElement('div');
+        confirmBox.classList.add('message-box', 'confirm');
+        confirmBox.innerHTML = `
+    <p>${message}</p>
+    <div class="confirm-buttons">
+      <button class="btn btn--yes">Yes</button>
+      <button class="btn btn--no">Cancel</button>
+    </div>
+  `;
+        document.body.append(confirmBox);
+
+        confirmBox.querySelector('.btn--yes').addEventListener('click', () => {
+            onConfirm();
+            confirmBox.remove();
+        });
+        confirmBox.querySelector('.btn--no').addEventListener('click', () => confirmBox.remove());
+    }
 
     reset() {
         localStorage.removeItem('workouts');
