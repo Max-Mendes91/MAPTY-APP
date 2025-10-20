@@ -406,14 +406,29 @@ class App {
 
     _getLocalStorage() {
         const data = JSON.parse(localStorage.getItem('workouts'));
-
-
-
         if (!data) return;
 
-        this.#workouts = data;
+        // Rebuild proper class instances
+        this.#workouts = data.map(obj => {
+            if (obj.type === 'running') {
+                const run = new Running(obj.coords, obj.distance, obj.duration, obj.cadence);
+                run.id = obj.id;
+                run.date = new Date(obj.date);
+                return run;
+            }
 
-        this.#workouts.forEach(work => { this._renderWorkout(work) });
+            if (obj.type === 'cycling') {
+                const cycle = new Cycling(obj.coords, obj.distance, obj.duration, obj.elevationGain);
+                cycle.id = obj.id;
+                cycle.date = new Date(obj.date);
+                return cycle;
+            }
+        });
+
+        // Render workouts and markers again
+        this.#workouts.forEach(work => {
+            this._renderWorkout(work);
+        });
     }
 
     _editWorkout(id) {
@@ -496,9 +511,10 @@ class App {
         // Clone to avoid mutating original
         const sorted = [...this.#workouts];
 
-        if (criteria === 'distance') sorted.sort((a, b) => b.distance - a.distance);
-        if (criteria === 'duration') sorted.sort((a, b) => b.duration - a.duration);
+        if (criteria === 'distance') sorted.sort((a, b) => +b.distance - +a.distance);
+        if (criteria === 'duration') sorted.sort((a, b) => +b.duration - +a.duration);
         if (criteria === 'date') sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+
 
         // Clear and re-render
         const workouts = document.querySelectorAll('.workout');
